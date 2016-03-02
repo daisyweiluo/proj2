@@ -785,7 +785,6 @@ function onKeyDown(event)
 	}
 }
 
-
        else if (keyboard.eventMatches(event,"k")) {
            aStep+=0.5;
            rStep+=0.01;
@@ -800,36 +799,88 @@ function onKeyDown(event)
  }
 
        else if (keyboard.eventMatches(event,"shift+q")&& relative == true) {
-       		var temp = getRotMatrix(Math.PI/10,"x");
-       		temp.multiply(new THREE.Matrix4().set(original_position[3],0,0,0, 0,original_position[4],0,0, 0,0,original_position[5],0, 0,0,0,1));
+    		scene.applyMatrix(gettransMatrix(-aStep,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			 rotObjectMatrix = new THREE.Matrix4();
 
-       		camera_ScoutShip.setMatrix(temp);
-    		//camera_ScoutShip.applyMatrix(getRotMatrix(Math.PI/10,"y"));
-    		console.log(camera_ScoutShip.position);
-			//camera_ScoutShip.lookAt( scene.position );
-			// space.rotation.y+=0.02;
-			// console.log(space.position);
+			 var xAxis = new THREE.Vector3(0,1,0);
+
+    		rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
+
+	}
+
+	       else if (keyboard.eventMatches(event,"q")&& relative == true) {
+     		scene.applyMatrix(gettransMatrix(aStep,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			 rotObjectMatrix = new THREE.Matrix4();
+
+			 var xAxis = new THREE.Vector3(0,-1,0);
+
+    		rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
 
 	}
 
         else if (keyboard.eventMatches(event,"shift+a")&& relative == true) {
      		camera_ScoutShip.up.x = camera_ScoutShip.up.x - aStep;
 			 camera_ScoutShip.lookAt( scene.position );
-			 space.rotation.x-=rStep;
+			 rotObjectMatrix = new THREE.Matrix4();
+			 var xAxis = new THREE.Vector3(0.5,0,0.5);
 
+    		rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
 	}
 
 	        else if (keyboard.eventMatches(event,"a")&& relative == true) {
      		camera_ScoutShip.up.x = camera_ScoutShip.up.x + aStep;
 			 camera_ScoutShip.lookAt( scene.position );
-			 space.rotation.x+=rStep;
+
+			 rotObjectMatrix = new THREE.Matrix4();
+			 var xAxis = new THREE.Vector3(-0.5,0,-0.5);
+
+			rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
+
+	}
+	 else if (keyboard.eventMatches(event,"shift+s")&& relative == true) {
+      		scene.applyMatrix(gettransMatrix(0,-aStep,0));
+			camera_ScoutShip.lookAt( scene.position );
+			 rotObjectMatrix = new THREE.Matrix4();
+			 var xAxis = new THREE.Vector3(0,1,2);
+
+    		rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
+	}
+
+	        else if (keyboard.eventMatches(event,"s")&& relative == true) {
+     	   	scene.applyMatrix(gettransMatrix(0,aStep,0));
+			camera_ScoutShip.lookAt( scene.position );
+
+			 rotObjectMatrix = new THREE.Matrix4();
+			 var xAxis = new THREE.Vector3(0,-1,-2);
+
+			rotObjectMatrix.makeRotationAxis(xAxis.normalize(), aStep/10);
+    		rotObjectMatrix.multiply(space.matrix);
+    		space.matrix = rotObjectMatrix;
+    		space.rotation.setFromRotationMatrix(space.matrix);
 
 	}
 
- 
-
 	        else if (keyboard.eventMatches(event,"shift+w")&& relative == true) {
-     		camera_ScoutShip.position.x = camera_ScoutShip.position.x/2;
+     		 scene.position.x = scene.position.x/2;
+     		 scene.position.y = scene.position.y/2;
+     		 scene.position.z = scene.position.z/2;
 			 camera_ScoutShip.lookAt( scene.position );
 			 space.position.x= space.position.x/2;
 			 space.position.y= space.position.y/2;
