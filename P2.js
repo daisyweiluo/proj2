@@ -529,6 +529,14 @@ function onKeyDown(event)
  			absolute = true;
  }
 
+
+   else if (keyboard.eventMatches(event,"shift+w")&& geo == true) {
+ 	    if (camera_ScoutShip.fov<=45){
+ 	    camera_ScoutShip.fov+=aStep*10;
+ 	    space.position.y+=0.2;
+ 	}
+  }
+
  else if (keyboard.eventMatches(event,"w")  && geo == true) {
  	    if (camera_ScoutShip.fov>5){
  	    camera_ScoutShip.fov-=aStep*10;
@@ -537,16 +545,11 @@ function onKeyDown(event)
   }
 
 
-   else if (keyboard.eventMatches(event,"0")&& geo == true) {
- 	    if (camera_ScoutShip.fov<=45){
- 	    camera_ScoutShip.fov+=aStep*10;
- 	    space.position.y+=0.2;
- 	}
-  }
+
 
   else if (keyboard.eventMatches(event,"1") && geo == true) {
   		camera_ScoutShip.parent=mercury;
-			space.applyMatrix(mercurymatrix);
+		space.setMatrix(mercuryRot);
 
  }
 
@@ -564,6 +567,8 @@ function onKeyDown(event)
    else if (keyboard.eventMatches(event,"4") && geo == true) {
    		camera_ScoutShip.parent=mars;
 		//space.parent=mars;
+		// space.position.x=mars.position.x;
+		// space.position.z=mars.position.z;
  }
  
 
