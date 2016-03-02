@@ -234,6 +234,7 @@ earthmatrix = multiplyHelper(torsoMatrix,earthMatrix);
 var earthgeometry = new THREE.SphereGeometry( 2, 32, 32 );
 generateVertexColors( earthgeometry );
 var earth = new THREE.Mesh( earthgeometry, earthMaterial );
+//earth.setMatrix(earthmatrix);
 scene.add(earth);
 
 var moonM=THREE.ImageUtils.loadTexture('moon.jpg');
@@ -833,7 +834,7 @@ function getRotMatrix(p, str){
   case "y":
   var obj = new THREE.Matrix4().set(Math.cos(p),        0,         -Math.sin(p),         0, 
                                             0,        1,        0,                      0, 
-                                -Math.sin(p),         0,         Math.cos(p),          0,
+                                Math.sin(p),         0,         Math.cos(p),          0,
                                             0,        0,         0,                     1);
   return obj;
   break;
@@ -853,7 +854,6 @@ function getRotMatrix(p, str){
   }
 
 }
-
 
 
 //helper function
