@@ -378,7 +378,7 @@ function updateSystem()
 	sun.rotation.y+=0.009;
 
   	//position
-  	moon.position.x=3+0;
+  	moon.position.x=4+0;
   	moon.position.z=0+0;
 
   	var rotateMer = getRotMatrix(i,"y");
@@ -516,8 +516,7 @@ function onKeyDown(event)
  }
 
  else if (keyboard.eventMatches(event,"g")) {
- 	//testfcn();
-      reset();
+ 	  reset();
  	  geo = true; 	
  }
   else if (keyboard.eventMatches(event,"p")) {
@@ -533,16 +532,59 @@ function onKeyDown(event)
  			absolute = true;
  }
 
- else if (keyboard.eventMatches(event,"w")) {
- 	    	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(-aStep,0,0));
-
-	}else{
-		camera_ScoutShip.applyMatrix(gettransMatrix(-aStep,0,0));
-		space.applyMatrix(gettransMatrix(-aStep,0,0));
+ else if (keyboard.eventMatches(event,"w")  && geo == true) {
+ 	console.log(camera_ScoutShip);
+ 	if (camera_ScoutShip.parent === undefined) {
+ 		camera_ScoutShip.parent=earth;
+		space.parent=earth;
 	}
+ 	    if (camera_ScoutShip.fov>5){
+ 	    camera_ScoutShip.fov-=aStep*10;
+ 	}
+  }
+
+  else if (keyboard.eventMatches(event,"1") && geo == true) {
+  		camera_ScoutShip.parent=mercury;
+		space.parent=mercury;
  }
-     
+
+  else if (keyboard.eventMatches(event,"2") && geo == true) {
+  		camera_ScoutShip.parent=venus;
+		space.parent=mercury;
+ }
+
+  else if (keyboard.eventMatches(event,"3") && geo == true) {
+  		camera_ScoutShip.parent=earth;
+		space.parent=earth;
+ }
+
+   else if (keyboard.eventMatches(event,"4") && geo == true) {
+   		camera_ScoutShip.parent=mars;
+		space.parent=mars;
+ }
+ 
+
+   else if (keyboard.eventMatches(event,"5") && geo == true ) {
+		camera_ScoutShip.parent=jupiter;
+		space.parent=jupiter;
+ }
+
+
+   else if (keyboard.eventMatches(event,"6") && geo == true ) {
+		camera_ScoutShip.parent=saturn;
+		space.parent=saturn;
+ }
+
+    else if (keyboard.eventMatches(event,"7") && geo == true) {
+		camera_ScoutShip.parent=uranus;
+		space.parent=uranus;
+ }
+
+    else if (keyboard.eventMatches(event,"8") && geo == true) {
+		camera_ScoutShip.parent=neptune;
+		space.parent=neptune;
+
+ }
 
 
      else if (keyboard.eventMatches(event,"shift+x") && absolute == true) {
@@ -858,6 +900,8 @@ function reset(){
  	i=0;
  	updateSystem();
 
+
+
  	scene.position.x=original_lookat[0];
  	scene.position.y=original_lookat[1];
  	scene.position.z=original_lookat[2];
@@ -882,6 +926,11 @@ function reset(){
  	camera_ScoutShip.up.z=original_up[5];
 
  	camera_ScoutShip.lookAt(scene.position);
+
+
+ 	//  if (camera_ScoutShip.parent!==undefined){
+ 	// 	camera_ScoutShip.parent.remove(camera_ScoutShip);
+ 	// }
 
  	//spaceeship reset
  	space.position.x=original_position[6];
