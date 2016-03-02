@@ -485,7 +485,7 @@ var spacecounter = 0;
 var mothership_press = true;
 var absolute =false;
 var relative =false;
-var geosync = false;
+var geo = false;
 var absoluteScale;
 var relativeScale;
 var aStep=0.5;
@@ -533,10 +533,10 @@ function onKeyDown(event)
  }
 
  else if (keyboard.eventMatches(event,"w")  && geo == true) {
- 	console.log(camera_ScoutShip);
+ 	console.log(camera_ScoutShip.parent);
  	if (camera_ScoutShip.parent === undefined) {
  		camera_ScoutShip.parent=earth;
-		space.parent=earth;
+		//space.parent=earth;
 	}
  	    if (camera_ScoutShip.fov>5){
  	    camera_ScoutShip.fov-=aStep*10;
