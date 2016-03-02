@@ -549,8 +549,6 @@ function onKeyDown(event)
 
   else if (keyboard.eventMatches(event,"1") && geo == true) {
   		camera_ScoutShip.parent=mercury;
-		space.setMatrix(mercuryRot);
-
  }
 
   else if (keyboard.eventMatches(event,"2") && geo == true) {
