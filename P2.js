@@ -77,7 +77,7 @@ var views = [
 		width: 0.499,
 		height: 1.0,
 		background: new THREE.Color().setRGB( 0.1, 0.1, 0.1 ),
-		eye: [ 65, 20, 65 ],
+		eye: [ 65,20,65],
 		up: [ 0, 1, 0 ],
 		fov: 45,
 		updateCamera: function ( camera, scene, mouseX, mouseY ) {		}
@@ -85,7 +85,9 @@ var views = [
 ];
 
 
-
+var original_position = [];
+var original_lookat = [];
+var original_up = [];
 //SETUP RENDERER & SCENE
 var canvas = document.getElementById('canvas');
 var scene = new THREE.Scene();
@@ -105,6 +107,10 @@ camera_MotherShip.up.y = view.up[ 1 ];
 camera_MotherShip.up.z = view.up[ 2 ];
 camera_MotherShip.lookAt( scene.position );
 view.camera = camera_MotherShip;
+//Added by lucy
+original_position.push(camera_MotherShip.position.x,camera_MotherShip.position.y, camera_MotherShip.position.z);
+original_up.push(camera_MotherShip.up.x,camera_MotherShip.up.y,camera_MotherShip.up.z);
+//
 scene.add(view.camera);
 
 var view = views[1];
@@ -117,6 +123,14 @@ camera_ScoutShip.up.y = view.up[ 1 ];
 camera_ScoutShip.up.z = view.up[ 2 ];
 camera_ScoutShip.lookAt( scene.position );
 view.camera = camera_ScoutShip;
+//Added by lucy
+original_position.push(camera_ScoutShip.position.x,camera_ScoutShip.position.y,camera_ScoutShip.position.z);
+original_up.push(camera_ScoutShip.up.x,camera_ScoutShip.up.y,camera_ScoutShip.up.z);
+original_lookat.push(scene.position.x);
+original_lookat.push(scene.position.y);
+original_lookat.push(scene.position.z);
+
+//
 scene.add(view.camera);
 
 
@@ -178,10 +192,13 @@ var geometry = new THREE.SphereGeometry( 3, 32, 32 );
 generateVertexColors( geometry );
 var centralgeometry = new THREE.SphereGeometry( 4, 32, 32 );
 generateVertexColors( centralgeometry );
-var normalMaterial = new THREE.MeshNormalMaterial(  {color: 0xffaa00, wireframe: true});
+//var normalMaterial = new THREE.MeshNormalMaterial(  {color: 0xffaa00, wireframe: true});
+var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } );
+var wingMaterial = new THREE.MeshBasicMaterial( { color: 0xFFFFFF, wireframe: true } );
+
 var photo1=THREE.ImageUtils.loadTexture('photo.jpg');
 var sunMaterial = new THREE.MeshBasicMaterial( {map:photo1} );
-var sun = new THREE.Mesh( centralgeometry, sunMaterial );
+var sun = new THREE.Mesh( centralgeometry, wireframeMaterial );
 var sun1 = new THREE.Mesh( geometry, sunMaterial );
 var sun2 = new THREE.Mesh( geometry, sunMaterial );
 var sun3 = new THREE.Mesh( geometry, sunMaterial );
@@ -200,7 +217,7 @@ scene.add( sun6 );
 scene.add( sun7 );
 
 
-var plantMaterial = new THREE.MeshPhongMaterial();
+var plantMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, specular: 0xffaa00, shading: THREE.FlatShading });
 
 var mercurygeometry = new THREE.SphereGeometry( 2, 32, 32 );
 generateVertexColors( mercurygeometry );
@@ -220,7 +237,7 @@ var earth = new THREE.Mesh( earthgeometry, plantMaterial );
 scene.add(earth);
 earth.parent=sun2;
 
-var moongeometry = new THREE.SphereGeometry( 1, 32, 32 );
+var moongeometry = new THREE.SphereGeometry( 0.5, 32, 32 );
 generateVertexColors( moongeometry );
 var moon = new THREE.Mesh( moongeometry, plantMaterial );
 scene.add(moon);
@@ -278,9 +295,42 @@ generateVertexColors( neptunegeometry );
 var neptune = new THREE.Mesh( neptunegeometry, plantMaterial );
 scene.add(neptune);
 neptune.parent=sun7;
+
+
+//Spaceship
+var texture = new THREE.Texture( generateTexture() );
+texture.needsUpdate = true;
+
+var spacegeometry = new THREE.TetrahedronGeometry(2,0);
+spacegeometry.vertices[1] = new THREE.Vector3(-5,-5,1);
+generateVertexColors( spacegeometry );
+
+var spacematerial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, morphTargets: true} );
+var space = new THREE.Mesh(spacegeometry, spacematerial);
+//var space = new THREE.Mesh(spacegeometry, wingMaterial);
+
+space.applyMatrix(getRotMatrix(Math.PI/2,"x"));
+space.applyMatrix(gettransMatrix(65,20,65));
+original_position.push(space.position.x);
+original_position.push(space.position.y);
+original_position.push(space.position.z);
+
+scene.add(space);
+
+//space wings
+var winggeometry = new THREE.BoxGeometry( 1, 1, 1 );
+var cube = new THREE.Mesh( winggeometry, spacematerial);
+scene.add( cube );
+cube.parent=space;
+cube.applyMatrix(gettransMatrix(0.5,-1,0))
+
+var cube2 = cube.clone();
+scene.add(cube2);
+cube2.parent=space;
+cube.applyMatrix(gettransMatrix(-1,2,0));
+
+
 //TO-DO: INITIALIZE THE REST OF YOUR PLANETS
-
-
 
 // create line
 for (var j=1;j<9;j++){
@@ -327,6 +377,7 @@ function updateSystem()
   	uranus.rotation.y+=0.02;
   	neptune.rotation.y+=0.004;
 
+  	//position
   	moon.position.x=3+0;
   	moon.position.z=0+0;
 
@@ -338,6 +389,7 @@ function updateSystem()
   	saturn.position.z=42;
   	uranus.position.z=49;
   	neptune.position.z=56;
+
 
 }
 
@@ -380,6 +432,12 @@ function update() {
 var keyboard = new THREEx.KeyboardState();
 var grid_state = false;
 var spacecounter = 0;
+var mothership_press = true;
+var absolute =false;
+var relative =false;
+
+var absoluteScale;
+var relativeScale;
 
 function onKeyDown(event)
 {
@@ -400,8 +458,375 @@ function onKeyDown(event)
  	spacecounter=0;
  }
 
-}
-keyboard.domElement.addEventListener('keydown', onKeyDown );
-		
+ else if (keyboard.eventMatches(event,"o")) {
+ 	mothership_press=true;
+ }
+  else if (keyboard.eventMatches(event,"p")) {
+ 	mothership_press=false;
+ }
+   else if (keyboard.eventMatches(event,"m")) {
+   	reset();
+   	console.log(camera_MotherShip);
 
+ }
+ else if (keyboard.eventMatches(event,"l")) {
+ 	absolute = true;
+ }
+     else if (keyboard.eventMatches(event,"shift+x") && absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(-0.5,0,0));
+
+	}else{
+		camera_ScoutShip.applyMatrix(gettransMatrix(-0.5,0,0));
+		space.applyMatrix(gettransMatrix(-0.5,0,0));
+	}
+
+ }
+
+    else if (keyboard.eventMatches(event,"x") && absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(0.5,0,0));
+
+	}else{
+		camera_ScoutShip.applyMatrix(gettransMatrix(0.5,0,0));
+		space.applyMatrix(gettransMatrix(0.5,0,0));
+	}
+
+ }
+      else if (keyboard.eventMatches(event,"shift+y")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,-0.5,0));
+	}else{
+
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,-0.5,0));
+		space.applyMatrix(gettransMatrix(0,-0.5,0));
+	}
+
+ }
+
+
+     else if (keyboard.eventMatches(event,"y")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,0.5,0));
+	}else{
+
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,0.5,0));
+		space.applyMatrix(gettransMatrix(0,0.5,0));
+	}
+
+ }
+
+      else if (keyboard.eventMatches(event,"shift+z")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,-0.5));
+	}else{
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,-0.5));
+		space.applyMatrix(gettransMatrix(0,0,-0.5));
+	}
+
+ }
+
+     else if (keyboard.eventMatches(event,"z")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,0.5));
+	}else{
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,0.5));
+		space.applyMatrix(gettransMatrix(0,0,0.5));
+	}
+
+ }
+
+
+      else if (keyboard.eventMatches(event,"shift+a")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(-0.5,0,0));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(-1,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			//var time = clock.getElapsedTime();
+			space.rotation.z-=0.02;
+			console.log(space.position);
+
+	}
+
+ }
+
+     else if (keyboard.eventMatches(event,"a")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0.5,0,0));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(1,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			//var time = clock.getElapsedTime();
+			space.rotation.z+=0.02;
+			console.log(space.position);
+
+	}
+
+ }
+
+
+      else if (keyboard.eventMatches(event,"shift+b")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,-0.5,0));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(0,-1,0));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.x-=0.02;
+			console.log(space.position);
+
+	}
+
+ }
+
+
+      else if (keyboard.eventMatches(event,"b")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,0.5,0));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(0,1,0));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.x+=0.02;
+			console.log(space.position);
+
+	}
+
+ }
+
+        else if (keyboard.eventMatches(event,"shift+c")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,0,-0.5));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(0,0,-1));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.y-=0.02;
+			console.log(space.position);
+
+	}
+
+ }
+
+
+      else if (keyboard.eventMatches(event,"c")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,0,0.5));
+			camera_MotherShip.lookAt( scene.position );
+	}else{
+    		scene.applyMatrix(gettransMatrix(0,0,1));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.y+=0.02;
+			console.log(space.position);
+
+	}
+ }
+
+       else if (keyboard.eventMatches(event,"shift+d")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.up.x = camera_MotherShip.up.x - 0.5;
+    		//camera_MotherShip.up.applyMatrix(gettransMatrix(1,0,0));
+			//camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.position);
+
+	}else{
+    		//scene.applyMatrix(gettransMatrix(0,0,1));
+    		camera_ScoutShip.up.x = camera_ScoutShip.up.x - 0.5;
+
+    		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.x-=0.02;
+			console.log(camera_ScoutShip.position);
+
+	}
+ }
+
+        else if (keyboard.eventMatches(event,"d")&& absolute == true) {
+    	if(mothership_press==true){
+    		camera_MotherShip.up.x = camera_MotherShip.up.x + 0.5;
+    		//camera_MotherShip.up.applyMatrix(gettransMatrix(1,0,0));
+			//camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.position);
+
+	}else{
+    		camera_ScoutShip.up.x = camera_ScoutShip.up.x + 0.5;
+    		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			camera_ScoutShip.lookAt( scene.position );
+			space.rotation.x+=0.02;
+			console.log(camera_ScoutShip.position);
+
+	}
+ }
+
+
+      else if (keyboard.eventMatches(event,"r")) {
+      	if(absolute == true){
+      		reset();
+      	}
+      	relative = true;
+ }
+
+       else if (keyboard.eventMatches(event,"shift+q")&& relative == true) {
+       		var temp = getRotMatrix(Math.PI/10,"x");
+       		temp.multiply(new THREE.Matrix4().set(original_position[3],0,0,0, 0,original_position[4],0,0, 0,0,original_position[5],0, 0,0,0,1));
+
+       		camera_ScoutShip.setMatrix(temp);
+    		//camera_ScoutShip.applyMatrix(getRotMatrix(Math.PI/10,"y"));
+    		console.log(camera_ScoutShip.position);
+			//camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.y+=0.02;
+			// console.log(space.position);
+
+	}
+
+ }
+
+
+ function onMouseRelease ( event ) {
+
+	switch( event.keyCode ) {
+
+	case 79: /*O*/
+
+
+						break;
+
+	case 80: /*P*/
+
+						break;
+
+				
+
+			}
+
+
+}
+
+function reset(){
+	sun.rotation.set(0,0,0);
+ 	sun1.rotation.set(0,0,0);
+ 	sun2.rotation.set(0,0,0);
+ 	sun3.rotation.set(0,0,0);
+ 	sun4.rotation.set(0,0,0);
+ 	sun5.rotation.set(0,0,0);
+ 	sun6.rotation.set(0,0,0);
+ 	sun7.rotation.set(0,0,0);
+ 	mothership_press=true;
+ 	absolute=false;
+ 	relative=false;
+
+ 	scene.position.x=original_lookat[0];
+ 	scene.position.y=original_lookat[1];
+ 	scene.position.z=original_lookat[2];
+
+ 	//camera_mothership reset
+ 	camera_MotherShip.position.x=original_position[0];
+ 	camera_MotherShip.position.y=original_position[1];
+ 	camera_MotherShip.position.z=original_position[2];
+
+ 	camera_MotherShip.up.x=original_up[0];
+ 	camera_MotherShip.up.y=original_up[1];
+ 	camera_MotherShip.up.z=original_up[2];
+
+ 	camera_MotherShip.lookAt(scene.position);
+ 	//camera_scoutship reset
+ 	camera_ScoutShip.position.x=original_position[3];
+ 	camera_ScoutShip.position.y=original_position[4];
+ 	camera_ScoutShip.position.z=original_position[5];
+
+ 	camera_ScoutShip.up.x=original_up[3];
+ 	camera_ScoutShip.up.y=original_up[4];
+ 	camera_ScoutShip.up.z=original_up[5];
+
+ 	camera_ScoutShip.lookAt(scene.position);
+
+ 	//spaceeship reset
+ 	space.position.x=original_position[6];
+ 	space.position.y=original_position[7];
+ 	space.position.z=original_position[8];
+
+ 	return;
+}
+
+//Taken from threejs.org/examples/webgl_materials.html for texture of spaceship
+function generateTexture() {
+
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 256;
+	canvas.height = 256;
+
+	var context = canvas.getContext( '2d' );
+	var image = context.getImageData( 0, 0, 256, 256 );
+
+	var x = 0, y = 0;
+	for ( var i = 0, j = 0, l = image.data.length; i < l; i += 4, j ++ ) {
+	x = j % 256;
+	y = x == 0 ? y + 1 : y;
+	image.data[ i ] = 255;
+	image.data[ i + 1 ] = 255;
+	image.data[ i + 2 ] = 255;
+	image.data[ i + 3 ] = Math.floor( x ^ y );
+
+	}
+
+	context.putImageData( image, 0, 0 );
+	return canvas;
+
+}
+
+//helper function
+// easier to write rotation
+function getRotMatrix(p, str){
+  switch(str)
+  {case "x":
+  var obj = new THREE.Matrix4().set(1,        0,         0,        0, 
+                                            0, Math.cos(p),-Math.sin(p), 0, 
+                                            0, Math.sin(p), Math.cos(p), 0,
+                                            0,        0,         0,        1);
+  return obj;
+  break;
+
+  case "y":
+  var obj = new THREE.Matrix4().set(Math.cos(p),        0,         -Math.sin(p),         0, 
+                                            0,        1,        0,                      0, 
+                                -Math.sin(p),         0,         Math.cos(p),          0,
+                                            0,        0,         0,                     1);
+  return obj;
+  break;
+
+  case "z":
+  var obj = new THREE.Matrix4().set(Math.cos(p),       -Math.sin(p),         0,        0, 
+                                 Math.sin(p),       Math.cos(p),          0,        0, 
+                                            0,                    0,        1,        0,
+                                            0,                    0,        0,        1);
+  return obj;
+  break;
+
+
+  default:
+  break;
+
+  }
+
+}
+
+//helper function
+// easier to write scale
+function getscaleMatrix(x,y,z){
+  var obj = new THREE.Matrix4().set(x,0,0,0, 0,y,0,0, 0,0,z,0, 0,0,0,1);
+  return obj;
+}
+
+//helper function
+// easier to write translation
+function gettransMatrix(x,y,z){
+  var obj = new THREE.Matrix4().set(1,0,0,x, 0,1,0,y, 0,0,1,z, 0,0,0,1);
+  return obj;
+}
+
+
+keyboard.domElement.addEventListener('keydown', onKeyDown );
 update();
