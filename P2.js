@@ -281,26 +281,10 @@ var saturn = new THREE.Mesh( saturngeometry, saturnMaterial );
 saturn.setMatrix(saturnmatrix);
 scene.add(saturn);
 
-// Saturn's ring
-for (var ra=1;ra<100;ra++){
-var segcount = 32;
-var radius = 3+0.01*ra;
-var linegeometry = new THREE.Geometry();
-var linematerial = new THREE.LineBasicMaterial({ color: 0xFFFFFF});
-
-for (var i = 0; i <= segcount; i++) {
-   	var theta = (i / segcount) * Math.PI * 2;
-    linegeometry.vertices.push(
-    	new THREE.Vector3(
-            Math.cos(theta) * radius,0,
-            Math.sin(theta) * radius
-            ));            
-}
-saturnring = new THREE.Line(linegeometry, linematerial)
-scene.add(saturnring);
-saturnring.parent=sun;
-saturnring.position.z=42;
-}
+var geometry = new THREE.RingGeometry( 3, 5, 100 );
+var material = new THREE.MeshBasicMaterial( { color: 0xfffff0, side: THREE.DoubleSide } );
+var mesh = new THREE.Mesh( geometry, material ); 
+scene.add( mesh );
 
 
 var uranusM=THREE.ImageUtils.loadTexture('uranus.jpg');
@@ -436,6 +420,16 @@ function updateSystem()
   	var saturnRot=multiplyHelper(rotateSa,saturnmatrixx);
   	saturn.setMatrix(saturnRot);
 
+
+     j=Math.PI/2;
+     var rotateRing = getRotMatrix(j,"x");
+     var transring = gettransMatrix(0,0,42); 
+ 	 ringMatrix=multiplyHelper(transring,rotateRing);
+ 	 var ringRot=multiplyHelper(rotateSa,ringMatrix);
+ 	 mesh.setMatrix(ringRot);
+// ringmatrix=multiplyHelper(transring,ringMatrix);
+
+
   	var rotateUr = getRotMatrix(i*1.05,"y");
   	var uranusmatrixx=multiplyHelper(uranusmatrix,rotateUr);
   	var uranusRot=multiplyHelper(rotateUr,uranusmatrixx);
@@ -500,6 +494,7 @@ var spacecounter = 0;
 var mothership_press = true;
 var absolute =false;
 var relative =false;
+var geosync = false;
 var absoluteScale;
 var relativeScale;
 var aStep=0.5;
@@ -529,9 +524,10 @@ function onKeyDown(event)
  	spacecounter=0;
  }
 
- else if (keyboard.eventMatches(event,"o")) {
- 	//mothership_press=true;
- 	testfcn();
+ else if (keyboard.eventMatches(event,"g")) {
+ 	//testfcn();
+      reset();
+ 	  geo = true; 	
  }
   else if (keyboard.eventMatches(event,"p")) {
  	mothership_press=false;
@@ -542,11 +538,22 @@ function onKeyDown(event)
 
  }
  else if (keyboard.eventMatches(event,"l")) {
- 	      	if( relative== true){
       		reset();
-      	}
- 	absolute = true;
+ 			absolute = true;
  }
+
+ else if (keyboard.eventMatches(event,"w")) {
+ 	    	if(mothership_press==true){
+    		camera_MotherShip.applyMatrix(gettransMatrix(-aStep,0,0));
+
+	}else{
+		camera_ScoutShip.applyMatrix(gettransMatrix(-aStep,0,0));
+		space.applyMatrix(gettransMatrix(-aStep,0,0));
+	}
+ }
+     
+
+
      else if (keyboard.eventMatches(event,"shift+x") && absolute == true) {
     	if(mothership_press==true){
     		camera_MotherShip.applyMatrix(gettransMatrix(-aStep,0,0));
@@ -862,6 +869,7 @@ function reset(){
  	mothership_press=true;
  	absolute=false;
  	relative=false;
+ 	geo = false;
 
  	scene.position.x=original_lookat[0];
  	scene.position.y=original_lookat[1];
