@@ -130,8 +130,6 @@ original_up.push(camera_ScoutShip.up.x,camera_ScoutShip.up.y,camera_ScoutShip.up
 original_lookat.push(scene.position.x);
 original_lookat.push(scene.position.y);
 original_lookat.push(scene.position.z);
-
-
 //
 scene.add(view.camera);
 
@@ -202,7 +200,6 @@ var sunM=THREE.ImageUtils.loadTexture('sun.jpg');
 var sunMaterial = new THREE.MeshBasicMaterial( {map:sunM} );
 var sun = new THREE.Mesh( centralgeometry, sunMaterial );
 scene.add( sun );
-
 
 
 var torsoMatrix = getscaleMatrix(1,1,1);  // b
@@ -329,14 +326,14 @@ var texture = new THREE.Texture( generateTexture() );
 texture.needsUpdate = true;
 
 var spacegeometry = new THREE.TetrahedronGeometry(2,0);
-spacegeometry.vertices[2] = new THREE.Vector3(-5,1,-5);
+spacegeometry.vertices[1] = new THREE.Vector3(-5,-5,1);
 generateVertexColors( spacegeometry );
 
 var spacematerial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, morphTargets: true} );
 var space = new THREE.Mesh(spacegeometry, spacematerial);
 //var space = new THREE.Mesh(spacegeometry, wingMaterial);
 
-//space.applyMatrix(getRotMatrix(Math.PI/2,"x"));
+space.applyMatrix(getRotMatrix(Math.PI/2,"x"));
 space.applyMatrix(gettransMatrix(65,20,65));
 original_position.push(space.position.x);
 original_position.push(space.position.y);
@@ -349,16 +346,16 @@ original_space.push(space.rotation.z);
 scene.add(space);
 
 //space wings
-// var winggeometry = new THREE.BoxGeometry( 1, 1, 1 );
-// var cube = new THREE.Mesh( winggeometry, spacematerial);
-// scene.add( cube );
-// cube.parent=space;
-// cube.applyMatrix(gettransMatrix(1,0,-0.3));
+var winggeometry = new THREE.BoxGeometry( 1, 1, 1 );
+var cube = new THREE.Mesh( winggeometry, spacematerial);
+scene.add( cube );
+cube.parent=space;
+cube.applyMatrix(gettransMatrix(0.5,-1,0));
 
-// var cube2 = cube.clone();
-// scene.add(cube2);
-// cube2.parent=space;
-// cube.applyMatrix(gettransMatrix(0,0,-0.3));
+var cube2 = cube.clone();
+scene.add(cube2);
+cube2.parent=space;
+cube.applyMatrix(gettransMatrix(-1,2,0));
 
 
 //TO-DO: INITIALIZE THE REST OF YOUR PLANETS
@@ -828,6 +825,18 @@ function onKeyDown(event)
      		camera_ScoutShip.up.x = camera_ScoutShip.up.x + aStep;
 			 camera_ScoutShip.lookAt( scene.position );
 			 space.rotation.x+=rStep;
+
+	}
+
+ 
+
+	        else if (keyboard.eventMatches(event,"shift+w")&& relative == true) {
+     		camera_ScoutShip.position.x = camera_ScoutShip.position.x/2;
+			 camera_ScoutShip.lookAt( scene.position );
+			 space.position.x= space.position.x/2;
+			 space.position.y= space.position.y/2;
+			 space.position.z= space.position.z/2;
+			 console.log(space.position);
 
 	}
 
