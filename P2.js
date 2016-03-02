@@ -88,6 +88,7 @@ var views = [
 var original_position = [];
 var original_lookat = [];
 var original_up = [];
+var original_space = [];
 //SETUP RENDERER & SCENE
 var canvas = document.getElementById('canvas');
 var scene = new THREE.Scene();
@@ -129,6 +130,7 @@ original_up.push(camera_ScoutShip.up.x,camera_ScoutShip.up.y,camera_ScoutShip.up
 original_lookat.push(scene.position.x);
 original_lookat.push(scene.position.y);
 original_lookat.push(scene.position.z);
+
 
 //
 scene.add(view.camera);
@@ -302,32 +304,36 @@ var texture = new THREE.Texture( generateTexture() );
 texture.needsUpdate = true;
 
 var spacegeometry = new THREE.TetrahedronGeometry(2,0);
-spacegeometry.vertices[1] = new THREE.Vector3(-5,-5,1);
+spacegeometry.vertices[2] = new THREE.Vector3(-5,1,-5);
 generateVertexColors( spacegeometry );
 
 var spacematerial = new THREE.MeshBasicMaterial( { map: texture, transparent: true, morphTargets: true} );
 var space = new THREE.Mesh(spacegeometry, spacematerial);
 //var space = new THREE.Mesh(spacegeometry, wingMaterial);
 
-space.applyMatrix(getRotMatrix(Math.PI/2,"x"));
+//space.applyMatrix(getRotMatrix(Math.PI/2,"x"));
 space.applyMatrix(gettransMatrix(65,20,65));
 original_position.push(space.position.x);
 original_position.push(space.position.y);
 original_position.push(space.position.z);
 
+original_space.push(space.rotation.x);
+original_space.push(space.rotation.y);
+original_space.push(space.rotation.z);
+
 scene.add(space);
 
 //space wings
-var winggeometry = new THREE.BoxGeometry( 1, 1, 1 );
-var cube = new THREE.Mesh( winggeometry, spacematerial);
-scene.add( cube );
-cube.parent=space;
-cube.applyMatrix(gettransMatrix(0.5,-1,0))
+// var winggeometry = new THREE.BoxGeometry( 1, 1, 1 );
+// var cube = new THREE.Mesh( winggeometry, spacematerial);
+// scene.add( cube );
+// cube.parent=space;
+// cube.applyMatrix(gettransMatrix(1,0,-0.3));
 
-var cube2 = cube.clone();
-scene.add(cube2);
-cube2.parent=space;
-cube.applyMatrix(gettransMatrix(-1,2,0));
+// var cube2 = cube.clone();
+// scene.add(cube2);
+// cube2.parent=space;
+// cube.applyMatrix(gettransMatrix(0,0,-0.3));
 
 
 //TO-DO: INITIALIZE THE REST OF YOUR PLANETS
@@ -390,7 +396,6 @@ function updateSystem()
   	uranus.position.z=49;
   	neptune.position.z=56;
 
-
 }
 
 // SETUP UPDATE CALL-BACK
@@ -435,9 +440,10 @@ var spacecounter = 0;
 var mothership_press = true;
 var absolute =false;
 var relative =false;
-
 var absoluteScale;
 var relativeScale;
+var aStep=0.5;
+var rStep=0.02;
 
 function onKeyDown(event)
 {
@@ -470,36 +476,39 @@ function onKeyDown(event)
 
  }
  else if (keyboard.eventMatches(event,"l")) {
+ 	      	if( relative== true){
+      		reset();
+      	}
  	absolute = true;
  }
      else if (keyboard.eventMatches(event,"shift+x") && absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(-0.5,0,0));
+    		camera_MotherShip.applyMatrix(gettransMatrix(-aStep,0,0));
 
 	}else{
-		camera_ScoutShip.applyMatrix(gettransMatrix(-0.5,0,0));
-		space.applyMatrix(gettransMatrix(-0.5,0,0));
+		camera_ScoutShip.applyMatrix(gettransMatrix(-aStep,0,0));
+		space.applyMatrix(gettransMatrix(-aStep,0,0));
 	}
 
  }
 
     else if (keyboard.eventMatches(event,"x") && absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(0.5,0,0));
+    		camera_MotherShip.applyMatrix(gettransMatrix(aStep,0,0));
 
 	}else{
-		camera_ScoutShip.applyMatrix(gettransMatrix(0.5,0,0));
-		space.applyMatrix(gettransMatrix(0.5,0,0));
+		camera_ScoutShip.applyMatrix(gettransMatrix(aStep,0,0));
+		space.applyMatrix(gettransMatrix(aStep,0,0));
 	}
 
  }
       else if (keyboard.eventMatches(event,"shift+y")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(0,-0.5,0));
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,-aStep,0));
 	}else{
 
-		camera_ScoutShip.applyMatrix(gettransMatrix(0,-0.5,0));
-		space.applyMatrix(gettransMatrix(0,-0.5,0));
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,-aStep,0));
+		space.applyMatrix(gettransMatrix(0,-aStep,0));
 	}
 
  }
@@ -507,45 +516,44 @@ function onKeyDown(event)
 
      else if (keyboard.eventMatches(event,"y")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(0,0.5,0));
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,aStep,0));
 	}else{
 
-		camera_ScoutShip.applyMatrix(gettransMatrix(0,0.5,0));
-		space.applyMatrix(gettransMatrix(0,0.5,0));
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,aStep,0));
+		space.applyMatrix(gettransMatrix(0,aStep,0));
 	}
 
  }
 
       else if (keyboard.eventMatches(event,"shift+z")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,-0.5));
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,-aStep));
 	}else{
-		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,-0.5));
-		space.applyMatrix(gettransMatrix(0,0,-0.5));
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,-aStep));
+		space.applyMatrix(gettransMatrix(0,0,-aStep));
 	}
 
  }
 
      else if (keyboard.eventMatches(event,"z")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,0.5));
+    		camera_MotherShip.applyMatrix(gettransMatrix(0,0,aStep));
 	}else{
-		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,0.5));
-		space.applyMatrix(gettransMatrix(0,0,0.5));
+		camera_ScoutShip.applyMatrix(gettransMatrix(0,0,aStep));
+		space.applyMatrix(gettransMatrix(0,0,aStep));
 	}
 
  }
 
-
       else if (keyboard.eventMatches(event,"shift+a")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(-0.5,0,0));
+    		scene.applyMatrix(gettransMatrix(-aStep,0,0));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(-1,0,0));
+    		scene.applyMatrix(gettransMatrix(-aStep,0,0));
 			camera_ScoutShip.lookAt( scene.position );
 			//var time = clock.getElapsedTime();
-			space.rotation.z-=0.02;
+			space.rotation.z-=rStep;
 			console.log(space.position);
 
 	}
@@ -554,13 +562,12 @@ function onKeyDown(event)
 
      else if (keyboard.eventMatches(event,"a")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(0.5,0,0));
+    		scene.applyMatrix(gettransMatrix(aStep,0,0));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(1,0,0));
+    		scene.applyMatrix(gettransMatrix(aStep,0,0));
 			camera_ScoutShip.lookAt( scene.position );
-			//var time = clock.getElapsedTime();
-			space.rotation.z+=0.02;
+			space.rotation.z+=rStep;
 			console.log(space.position);
 
 	}
@@ -570,27 +577,26 @@ function onKeyDown(event)
 
       else if (keyboard.eventMatches(event,"shift+b")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(0,-0.5,0));
+    		scene.applyMatrix(gettransMatrix(0,-aStep,0));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(0,-1,0));
+    		scene.applyMatrix(gettransMatrix(0,-aStep,0));
 			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.x-=0.02;
+			space.rotation.x-=rStep;
 			console.log(space.position);
 
 	}
 
  }
 
-
       else if (keyboard.eventMatches(event,"b")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(0,0.5,0));
+    		scene.applyMatrix(gettransMatrix(0,aStep,0));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(0,1,0));
+    		scene.applyMatrix(gettransMatrix(0,aStep,0));
 			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.x+=0.02;
+			space.rotation.x+=rStep;
 			console.log(space.position);
 
 	}
@@ -599,12 +605,12 @@ function onKeyDown(event)
 
         else if (keyboard.eventMatches(event,"shift+c")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(0,0,-0.5));
+    		scene.applyMatrix(gettransMatrix(0,0,-aStep));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(0,0,-1));
+    		scene.applyMatrix(gettransMatrix(0,0,-aStep));
 			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.y-=0.02;
+			space.rotation.y-=rStep;
 			console.log(space.position);
 
 	}
@@ -614,12 +620,12 @@ function onKeyDown(event)
 
       else if (keyboard.eventMatches(event,"c")&& absolute == true) {
     	if(mothership_press==true){
-    		scene.applyMatrix(gettransMatrix(0,0,0.5));
+    		scene.applyMatrix(gettransMatrix(0,0,aStep));
 			camera_MotherShip.lookAt( scene.position );
 	}else{
-    		scene.applyMatrix(gettransMatrix(0,0,1));
+    		scene.applyMatrix(gettransMatrix(0,0,aStep));
 			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.y+=0.02;
+			space.rotation.y+=rStep;
 			console.log(space.position);
 
 	}
@@ -627,40 +633,103 @@ function onKeyDown(event)
 
        else if (keyboard.eventMatches(event,"shift+d")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.up.x = camera_MotherShip.up.x - 0.5;
-    		//camera_MotherShip.up.applyMatrix(gettransMatrix(1,0,0));
-			//camera_MotherShip.lookAt( scene.position );
+    		scene.applyMatrix(gettransMatrix(-aStep,0,0));
+			camera_MotherShip.lookAt( scene.position );
 			console.log(camera_MotherShip.position);
 
 	}else{
-    		//scene.applyMatrix(gettransMatrix(0,0,1));
-    		camera_ScoutShip.up.x = camera_ScoutShip.up.x - 0.5;
-
-    		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
-			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.x-=0.02;
-			console.log(camera_ScoutShip.position);
+   //  		//scene.applyMatrix(gettransMatrix(0,0,1));
+   //  		camera_ScoutShip.up.x = camera_ScoutShip.up.x - 0.5;
+   //  		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			// camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.x-=0.02;
+			// console.log(camera_ScoutShip.position);
 
 	}
  }
 
         else if (keyboard.eventMatches(event,"d")&& absolute == true) {
     	if(mothership_press==true){
-    		camera_MotherShip.up.x = camera_MotherShip.up.x + 0.5;
-    		//camera_MotherShip.up.applyMatrix(gettransMatrix(1,0,0));
-			//camera_MotherShip.lookAt( scene.position );
+    		scene.applyMatrix(gettransMatrix(+aStep,0,0));
+			camera_MotherShip.lookAt( scene.position );
 			console.log(camera_MotherShip.position);
 
 	}else{
-    		camera_ScoutShip.up.x = camera_ScoutShip.up.x + 0.5;
-    		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
-			camera_ScoutShip.lookAt( scene.position );
-			space.rotation.x+=0.02;
-			console.log(camera_ScoutShip.position);
+   //  		camera_ScoutShip.up.x = camera_ScoutShip.up.x + 0.5;
+   //  		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			// camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.x+=0.02;
+			// console.log(camera_ScoutShip.position);
 
 	}
  }
 
+         else if (keyboard.eventMatches(event,"shift+e")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,-aStep,0));
+			camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.up);
+
+	}else{
+   //  		camera_ScoutShip.up.y = camera_ScoutShip.up.y - 0.5;
+   //  		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			// camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.y-=0.02;
+			// console.log(camera_ScoutShip.up);
+
+	}
+ }
+
+         else if (keyboard.eventMatches(event,"e")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,aStep,0));
+			camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.up);
+
+	}else{
+   //  		camera_ScoutShip.up.y = camera_ScoutShip.up.y + 0.5;
+   //  		camera_ScoutShip.up.y = Math.min(camera_ScoutShip.up.y, 1);
+   //  		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			// camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.y+=0.02;
+			// console.log(camera_ScoutShip.up);
+
+	}
+ }
+
+          else if (keyboard.eventMatches(event,"shift+f")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,0,aStep));
+			camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.up);
+
+	}else{
+   //  		camera_ScoutShip.up.y = camera_ScoutShip.up.y + 0.5;
+   //  		camera_ScoutShip.up.y = Math.min(camera_ScoutShip.up.y, 1);
+   //  		//camera_ScoutShip.up.applyMatrix(gettransMatrix(1,0,0));
+			// camera_ScoutShip.lookAt( scene.position );
+			// space.rotation.y+=0.02;
+			// console.log(camera_ScoutShip.up);
+
+	}
+ }
+
+       else if (keyboard.eventMatches(event,"f")&& absolute == true) {
+    	if(mothership_press==true){
+    		scene.applyMatrix(gettransMatrix(0,0,-aStep));
+			camera_MotherShip.lookAt( scene.position );
+			console.log(camera_MotherShip.up);
+
+	}else{
+	}
+}
+
+
+       else if (keyboard.eventMatches(event,"k")) {
+           aStep+=0.5;
+           rStep+=0.01;
+
+}
 
       else if (keyboard.eventMatches(event,"r")) {
       	if(absolute == true){
@@ -682,6 +751,20 @@ function onKeyDown(event)
 
 	}
 
+        else if (keyboard.eventMatches(event,"shift+a")&& relative == true) {
+     		camera_ScoutShip.up.x = camera_ScoutShip.up.x - aStep;
+			 camera_ScoutShip.lookAt( scene.position );
+			 space.rotation.x-=rStep;
+
+	}
+
+	        else if (keyboard.eventMatches(event,"a")&& relative == true) {
+     		camera_ScoutShip.up.x = camera_ScoutShip.up.x + aStep;
+			 camera_ScoutShip.lookAt( scene.position );
+			 space.rotation.x+=rStep;
+
+	}
+
  }
 
 
@@ -690,15 +773,11 @@ function onKeyDown(event)
 	switch( event.keyCode ) {
 
 	case 79: /*O*/
-
-
 						break;
 
 	case 80: /*P*/
 
-						break;
-
-				
+						break;			
 
 			}
 
@@ -747,6 +826,14 @@ function reset(){
  	space.position.x=original_position[6];
  	space.position.y=original_position[7];
  	space.position.z=original_position[8];
+
+ 	space.rotation.x=original_space[0];
+ 	space.rotation.y=original_space[1];
+ 	space.rotation.z=original_space[2];
+
+
+ 	aStep=0.5;
+	rStep=0.02;
 
  	return;
 }
