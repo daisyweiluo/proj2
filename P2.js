@@ -530,13 +530,15 @@ function onKeyDown(event)
  }
 
  else if (keyboard.eventMatches(event,"w")  && geo == true) {
- 	console.log(camera_ScoutShip.parent);
- 	if (camera_ScoutShip.parent === undefined) {
- 		camera_ScoutShip.parent=earth;
-		//space.parent=earth;
-	}
  	    if (camera_ScoutShip.fov>5){
  	    camera_ScoutShip.fov-=aStep*10;
+ 	}
+  }
+
+
+   else if (keyboard.eventMatches(event,"0")  && geo == true) {
+ 	    if (camera_ScoutShip.fov<=45){
+ 	    camera_ScoutShip.fov+=aStep*10;
  	}
   }
 
