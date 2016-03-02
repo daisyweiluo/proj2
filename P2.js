@@ -546,7 +546,8 @@ function onKeyDown(event)
 
   else if (keyboard.eventMatches(event,"1") && geo == true) {
   		camera_ScoutShip.parent=mercury;
-		space.parent=mercury;
+			space.applyMatrix(mercurymatrix);
+
  }
 
   else if (keyboard.eventMatches(event,"2") && geo == true) {
@@ -990,7 +991,7 @@ function reset(){
  	camera_ScoutShip.up.y=original_up[4];
  	camera_ScoutShip.up.z=original_up[5];
 
- 	camera_ScoutShip.parent=sun;
+ 	//camera_ScoutShip.parent=sun;
  	//camera_ScoutShip.parent=this;
 
  	//spaceeship reset
