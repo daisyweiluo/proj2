@@ -68,7 +68,7 @@ var views = [
 		background: new THREE.Color().setRGB( 0.1, 0.1, 0.1 ),
 		eye: [ 80, 20, 80 ],
 		up: [ 0, 1, 0 ],
-		fov: 20,
+		fov: 45,
 		updateCamera: function ( camera, scene, mouseX, mouseY ) {		}
 	},
 	{
