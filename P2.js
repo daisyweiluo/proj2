@@ -482,7 +482,7 @@ var spacecounter = 0;
 var mothership_press = true;
 var absolute =false;
 var relative =false;
-var geosync = false;
+var geo = false;
 var absoluteScale;
 var relativeScale;
 var aStep=0.5;
