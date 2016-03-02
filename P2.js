@@ -377,15 +377,6 @@ function updateSystem()
 	// ANIMATE YOUR SOLAR SYSTEM HERE.
 	sun.rotation.y+=0.009;
 
-	//mercury.rotation.y+=0.03;
-  	venus.rotation.y+=0.02;
-  	earth.rotation.y+=0.02;
-  	mars.rotation.y+=0.008;
-  	jupiter.rotation.y+=0.009;
-  	saturn.rotation.y+=0.04;
-  	uranus.rotation.y+=0.02;
-  	neptune.rotation.y+=0.004;
-
   	//position
   	moon.position.x=3+0;
   	moon.position.z=0+0;
@@ -859,17 +850,13 @@ function onKeyDown(event)
 
 function reset(){
 	sun.rotation.set(0,0,0);
- 	sun1.rotation.set(0,0,0);
- 	sun2.rotation.set(0,0,0);
- 	sun3.rotation.set(0,0,0);
- 	sun4.rotation.set(0,0,0);
- 	sun5.rotation.set(0,0,0);
- 	sun6.rotation.set(0,0,0);
- 	sun7.rotation.set(0,0,0);
  	mothership_press=true;
  	absolute=false;
  	relative=false;
  	geo = false;
+
+ 	i=0;
+ 	updateSystem();
 
  	scene.position.x=original_lookat[0];
  	scene.position.y=original_lookat[1];
