@@ -532,13 +532,15 @@ function onKeyDown(event)
  else if (keyboard.eventMatches(event,"w")  && geo == true) {
  	    if (camera_ScoutShip.fov>5){
  	    camera_ScoutShip.fov-=aStep*10;
+ 	    space.position.y-=0.2;
  	}
   }
 
 
-   else if (keyboard.eventMatches(event,"0")  && geo == true) {
+   else if (keyboard.eventMatches(event,"0")&& geo == true) {
  	    if (camera_ScoutShip.fov<=45){
  	    camera_ScoutShip.fov+=aStep*10;
+ 	    space.position.y+=0.2;
  	}
   }
 
@@ -549,39 +551,40 @@ function onKeyDown(event)
 
   else if (keyboard.eventMatches(event,"2") && geo == true) {
   		camera_ScoutShip.parent=venus;
-		space.parent=mercury;
+		//space.parent=mercury;
  }
 
   else if (keyboard.eventMatches(event,"3") && geo == true) {
   		camera_ScoutShip.parent=earth;
-		space.parent=earth;
+		//space.position.x=earth.position.x;
+		//space.position.z=earth.position.z;
  }
 
    else if (keyboard.eventMatches(event,"4") && geo == true) {
    		camera_ScoutShip.parent=mars;
-		space.parent=mars;
+		//space.parent=mars;
  }
  
 
    else if (keyboard.eventMatches(event,"5") && geo == true ) {
 		camera_ScoutShip.parent=jupiter;
-		space.parent=jupiter;
+		//space.parent=jupiter;
  }
 
 
    else if (keyboard.eventMatches(event,"6") && geo == true ) {
 		camera_ScoutShip.parent=saturn;
-		space.parent=saturn;
+		//space.parent=saturn;
  }
 
     else if (keyboard.eventMatches(event,"7") && geo == true) {
 		camera_ScoutShip.parent=uranus;
-		space.parent=uranus;
+		//space.parent=uranus;
  }
 
     else if (keyboard.eventMatches(event,"8") && geo == true) {
 		camera_ScoutShip.parent=neptune;
-		space.parent=neptune;
+		//space.parent=neptune;
 
  }
 
@@ -987,12 +990,8 @@ function reset(){
  	camera_ScoutShip.up.y=original_up[4];
  	camera_ScoutShip.up.z=original_up[5];
 
- 	camera_ScoutShip.lookAt(scene.position);
-
-
- 	//  if (camera_ScoutShip.parent!==undefined){
- 	// 	camera_ScoutShip.parent.remove(camera_ScoutShip);
- 	// }
+ 	camera_ScoutShip.parent=sun;
+ 	//camera_ScoutShip.parent=this;
 
  	//spaceeship reset
  	space.position.x=original_position[6];
